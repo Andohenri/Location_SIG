@@ -3,11 +3,21 @@ import { Tabs } from 'expo-router';
 
 export default function TabsLayout() {
    return (
-      <Tabs>
+      <Tabs screenOptions={{
+         tabBarActiveTintColor: '#FFA001',
+         tabBarInactiveTintColor: '#CDCDE0',
+         tabBarStyle: {
+            backgroundColor: '#161622',
+            borderTopWidth: 2,
+            borderTopColor: '#232533',
+            height: 64
+         }
+      }}>
          <Tabs.Screen
             name='home'
             options={{
                title: 'Home',
+               headerShown: false,
                tabBarIcon: ({ color, focused }) => (
                   <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
                )
@@ -17,8 +27,9 @@ export default function TabsLayout() {
             name='explore'
             options={{
                title: 'Explore',
+               headerShown: false,
                tabBarIcon: ({ color, focused }) => (
-                  <TabBarIcon name={focused ? 'search-circle' : 'search-circle-outline'} color={color} />
+                  <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />
                )
             }}
          />
