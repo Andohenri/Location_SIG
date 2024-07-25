@@ -1,63 +1,33 @@
-import { StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { FlatList, Image, StyleSheet } from 'react-native'
+import React, { useContext, useRef, useState } from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { ThemedText } from '@/components/ThemedText'
-import MapView, { Marker } from 'react-native-maps'
-import * as Location from 'expo-location'
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import { LinearGradient } from 'expo-linear-gradient'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
-import { GOOGLE_API_KEY } from '@/constants/apiKey'
-
-interface LocationObject {
-  coords: {
-    latitude: number;
-    longitude: number;
-    altitude: number | null;
-    accuracy: number | null;
-    altitudeAccuracy: number | null;
-    heading: number | null;
-    speed: number | null;
-  };
-  timestamp: number;
-}
+import { GOOGLE_API_KEY } from '@/constants/ApiKey'
+import { LocationContext } from '@/contexts/LocationProvider'
+import { nearPlace } from '@/constants/Data'
+import CardPlace from '@/components/CardPlace'
+import { toast } from '@/lib/toast'
 
 const Home = () => {
-  const [location, setLocation] = useState<null | LocationObject>(null);
-  const [errorMsg, setErrorMsg] = useState<null | string>(null);
+  const [places, setPlaces] = useState(nearPlace.results)
+  const listRef = useRef<FlatList<any>>(null);
+  const locationContext = useContext(LocationContext);
+  if (!locationContext) {
+    throw new Error("useContext doit etre utiliser dans LocationProvider");
+  }
+  const { location } = locationContext;
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-
-      Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 10000,
-          distanceInterval: 10,
-        },
-        (newLocation: LocationObject) => {
-          setLocation(newLocation);
-        }
-      );
-    })();
-  }, []);
-
-  let text = 'Waiting..';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
+  const handleMarkerPress = (placeId: string) => {
+    const index = places.findIndex(place => place.place_id === placeId);
+    if(index !== -1 && listRef.current)
+    listRef.current.scrollToIndex({ index, animated: true, viewPosition: 0.5 })
   }
 
-  return (<>
+  return (
     <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-
       <MapView
         initialRegion={{
           latitude: location?.coords.latitude || -21.453611,
@@ -67,8 +37,22 @@ const Home = () => {
         }}
         showsUserLocation={true}
         followsUserLocation={true}
+        provider={PROVIDER_GOOGLE}
         style={{ width: '100%', height: '100%' }}
       >
+        {places?.map(place => (
+          <Marker
+            key={place.place_id}
+            coordinate={{
+              latitude: place.geometry.location.lat,
+              longitude: place.geometry.location.lng,
+            }}
+            image={{ uri: `${place.icon}` }}
+            description={`${place.vicinity}--${place.types[0]}`}
+            title={place.name}
+            onPress={() => handleMarkerPress(place.place_id)}
+          />
+        ))}
         {location && (
           <Marker
             coordinate={{
@@ -78,41 +62,54 @@ const Home = () => {
             title="You are here"
           />
         )}
-        <Marker
-          coordinate={{ latitude: -21.4606237, longitude: 47.1063029 }}
-          description="My location"
-          title='My position'
-        />
       </MapView>
-
+      <ThemedView style={{ position: 'absolute', top: 0, width: '100%', backgroundColor: 'transparent', paddingHorizontal: 16, paddingTop: 48 }}>
+        <LinearGradient colors={['#fff', 'transparent']} style={{ height: '100%', right: 0, left: 0, position: 'absolute' }} />
+        <ThemedView style={{ backgroundColor: 'transparent', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', marginBottom: 6 }}>
+          <ThemedText type='title'>L-SIG</ThemedText>
+          <Image source={require('../../assets/images/react-logo.png')} resizeMode='contain' style={{ width: 32, height: 32 }} />
+        </ThemedView>
+        <GooglePlacesAutocomplete
+          placeholder='Search...'
+          onPress={(data, details = null) => {
+            console.log(details);
+            console.log(data);
+          }}
+          query={{
+            key: GOOGLE_API_KEY,
+            language: 'en'
+          }}
+          styles={{ textInputContainer: styles.textContainer, textInput: styles.textInput, predefinedPlacesDescription: { color: '#1faadb' } }}
+        />
+      </ThemedView>
+      <FlatList
+        ref={listRef}
+        style={styles.list}
+        data={places}
+        horizontal
+        keyExtractor={item => item.place_id}
+        renderItem={({ item }) => (
+          <CardPlace place={item} />
+        )}
+      />
     </ThemedView>
-    <GooglePlacesAutocomplete
-      placeholder='Search...'
-      onPress={(data, details = null) => {
-        console.log(details);
-        console.log(data);
-      }}
-      query={{
-        key: GOOGLE_API_KEY,
-        language: 'en'
-      }}
-      styles={{ textInputContainer: styles.textContainer, textInput: styles.textInput, predefinedPlacesDescription: { color: '#1faadb' } }}
-    />
-  </>)
+  )
 }
 
 export default Home
 
 const styles = StyleSheet.create({
   textContainer: {
-    backgroundColor: '#000',
-    borderTopWidth: 0,
-    borderBottomWidth: 0
+    flex: 1,
+    borderRadius: 24
   },
   textInput: {
-    marginLeft: 16,
-    marginRight: 16,
-    height: 38,
-    fontSize: 16
+    paddingHorizontal: 16,
+    elevation: 2
+  },
+  list: {
+    position: 'absolute',
+    bottom: 0,
+    paddingVertical: 8,
   }
 })
