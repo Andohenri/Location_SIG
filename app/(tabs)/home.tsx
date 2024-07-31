@@ -71,9 +71,9 @@ const Home = () => {
       </MapView>
       <ThemedView style={{ position: 'absolute', top: 0, width: '100%', backgroundColor: 'transparent', paddingHorizontal: 16, paddingTop: 48 }}>
         <LinearGradient colors={['#fff', 'transparent']} style={{ height: '100%', right: 0, left: 0, position: 'absolute' }} />
-        <ThemedView style={{ backgroundColor: 'transparent', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', marginBottom: 6 }}>
-          <ThemedText type='title' style={{ color: '#161622' }}>L-SIG</ThemedText>
-          <Image source={require('../../assets/images/react-logo.png')} resizeMode='contain' style={{ width: 32, height: 32 }} />
+        <ThemedView style={{ backgroundColor: 'transparent', alignItems: 'center', gap: 10, flexDirection: 'row', marginBottom: 6 }}>
+          <Image source={require('../../assets/images/logo.png')} resizeMode='contain' style={{ width: 40, height: 40 }} />
+          <ThemedText type='title' style={{ color: '#161622' }}>MapMaker</ThemedText>
         </ThemedView>
         <GooglePlacesAutocomplete
           placeholder='Search...'
