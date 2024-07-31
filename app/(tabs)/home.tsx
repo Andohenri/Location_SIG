@@ -1,5 +1,5 @@
-import { FlatList, Image, StyleSheet } from 'react-native'
-import React, { useContext, useRef, useState } from 'react'
+import { FlatList, Image, StyleSheet, View } from 'react-native'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { ThemedText } from '@/components/ThemedText'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
@@ -10,24 +10,37 @@ import { LocationContext } from '@/contexts/LocationProvider'
 import { nearPlace } from '@/constants/Data'
 import CardPlace from '@/components/CardPlace'
 import { toast } from '@/lib/toast'
+import useMap from '@/hooks/useMap'
+import { fetchPlaces } from '@/lib/map'
+import { StatusBar } from 'expo-status-bar'
 
 const Home = () => {
-  const [places, setPlaces] = useState(nearPlace.results)
   const listRef = useRef<FlatList<any>>(null);
   const locationContext = useContext(LocationContext);
   if (!locationContext) {
     throw new Error("useContext doit etre utiliser dans LocationProvider");
   }
   const { location } = locationContext;
+  const { data, loading, refetch } = useMap(() => fetchPlaces(location?.coords.latitude ?? -21.453611, location?.coords.longitude || 47.085833, ['']));
+  const [places, setPlaces] = useState(data)
+
+  useEffect(() => {
+    setPlaces(data)
+  }, [data, loading])
+
+  useEffect(() => {
+    refetch();
+  }, [])
 
   const handleMarkerPress = (placeId: string) => {
-    const index = places.findIndex(place => place.place_id === placeId);
-    if(index !== -1 && listRef.current)
-    listRef.current.scrollToIndex({ index, animated: true, viewPosition: 0.5 })
+    const index = places.findIndex((place: any) => place.place_id === placeId);
+    if (index !== -1 && listRef.current)
+      listRef.current.scrollToIndex({ index, animated: true, viewPosition: 0.5 })
   }
 
   return (
-    <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <ThemedView style={{ flex: 1, position: 'relative', justifyContent: 'center', alignItems: 'center' }}>
+      <LinearGradient colors={['transparent', '#fff']} style={{ height: 100, right: 0, left: 0, bottom: 0, zIndex: 10, position: 'absolute' }} />
       <MapView
         initialRegion={{
           latitude: location?.coords.latitude || -21.453611,
@@ -36,37 +49,30 @@ const Home = () => {
           longitudeDelta: 0.0421
         }}
         showsUserLocation={true}
-        followsUserLocation={true}
         provider={PROVIDER_GOOGLE}
         style={{ width: '100%', height: '100%' }}
       >
-        {places?.map(place => (
+        {places?.map((place: any) => (
           <Marker
             key={place.place_id}
             coordinate={{
               latitude: place.geometry.location.lat,
               longitude: place.geometry.location.lng,
             }}
-            image={{ uri: `${place.icon}` }}
             description={`${place.vicinity}--${place.types[0]}`}
             title={place.name}
             onPress={() => handleMarkerPress(place.place_id)}
-          />
+          >
+            <View style={{ backgroundColor: "#fff", padding: 2, justifyContent: 'center', alignItems: 'center', zIndex: 10, borderRadius: 50, borderWidth: 2, borderColor: '#ccc',  elevation: 5, width: 20, height: 20 }}>
+              <Image source={{ uri: `${place.icon}` }} resizeMode='contain' style={{width: 16, height: 16}} />
+            </View>
+          </Marker>
         ))}
-        {location && (
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            title="You are here"
-          />
-        )}
       </MapView>
       <ThemedView style={{ position: 'absolute', top: 0, width: '100%', backgroundColor: 'transparent', paddingHorizontal: 16, paddingTop: 48 }}>
         <LinearGradient colors={['#fff', 'transparent']} style={{ height: '100%', right: 0, left: 0, position: 'absolute' }} />
         <ThemedView style={{ backgroundColor: 'transparent', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', marginBottom: 6 }}>
-          <ThemedText type='title'>L-SIG</ThemedText>
+          <ThemedText type='title' style={{ color: '#161622' }}>L-SIG</ThemedText>
           <Image source={require('../../assets/images/react-logo.png')} resizeMode='contain' style={{ width: 32, height: 32 }} />
         </ThemedView>
         <GooglePlacesAutocomplete
@@ -92,6 +98,7 @@ const Home = () => {
           <CardPlace place={item} />
         )}
       />
+      <StatusBar style='dark' />
     </ThemedView>
   )
 }
@@ -101,15 +108,18 @@ export default Home
 const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
-    borderRadius: 24
+    borderRadius: 24,
   },
   textInput: {
+    borderColor: '#FFA001',
+    borderWidth: 1,
     paddingHorizontal: 16,
     elevation: 2
   },
   list: {
+    zIndex: 20,
     position: 'absolute',
     bottom: 0,
-    paddingVertical: 8,
+    paddingVertical: 10,
   }
 })

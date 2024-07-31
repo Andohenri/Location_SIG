@@ -1,8 +1,8 @@
 import { Alert } from "react-native";
 import { useEffect, useState } from "react";
 
-const useMap = (fn: Function) => {
-  const [data, setData] = useState([]);
+const useMap = (fn: any) => {
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<Boolean>(true);
 
   const fetchData = async () => {

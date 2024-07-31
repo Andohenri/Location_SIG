@@ -15,15 +15,15 @@ export const nearPlace = {
          "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
          "name": "Fianarantsoa",
          "photos": [{
-            "height": 4330, 
-            "html_attributions": ["\u003ca href=\"https://maps.google.com/maps/contrib/103871854525759614982\"\u003eAndry Niaina\u003c/a\u003e"], 
-            "photo_reference": "AelY_CtgktHvjo8sCTaQxknY0jhpClcGgObNvoxhUyQdyWPm2qJMaRVUlX3CXkKG3vRcp3RhykKgQus2RbARUW3A-vxAM-VEd00xowkGBd2XYUL-fElkbbati6GFMDpG0j-W_i1I-C3JfMlcRJ6_NPRHfbmO03erqVLAQHL2AASa1UjP2BrF", 
+            "height": 4330,
+            "html_attributions": ["\u003ca href=\"https://maps.google.com/maps/contrib/103871854525759614982\"\u003eAndry Niaina\u003c/a\u003e"],
+            "photo_reference": "AelY_CtgktHvjo8sCTaQxknY0jhpClcGgObNvoxhUyQdyWPm2qJMaRVUlX3CXkKG3vRcp3RhykKgQus2RbARUW3A-vxAM-VEd00xowkGBd2XYUL-fElkbbati6GFMDpG0j-W_i1I-C3JfMlcRJ6_NPRHfbmO03erqVLAQHL2AASa1UjP2BrF",
             "width": 5773
-         }], 
-         "place_id": "ChIJqwp_ccC-5yER7QU_MTSSuLo", 
-         "reference": "ChIJqwp_ccC-5yER7QU_MTSSuLo", 
-         "scope": "GOOGLE", 
-         "types": ["locality", "political"], 
+         }],
+         "place_id": "ChIJqwp_ccC-5yER7QU_MTSSuLo",
+         "reference": "ChIJqwp_ccC-5yER7QU_MTSSuLo",
+         "scope": "GOOGLE",
+         "types": ["locality", "political"],
          "vicinity": "Fianarantsoa"
       },
       {
@@ -350,7 +350,10 @@ export const nearPlace = {
          "name": "Zomatel Hotel",
          "opening_hours": { "open_now": true },
          "photos": [{
-            "height": 4912, "html_attributions": ["\u003ca href=\"https://maps.google.com/maps/contrib/108168094198408273739\"\u003eZomatel Hotel\u003c/a\u003e"], "photo_reference": "AelY_Cvi_2qKjCKvEi4bRgdeDZoWSb5LoSIZRVPfT9B7gBPeB4WOYEQi_5BLQFE2qIREllXifsmeBNNKHnNqnq4eaNgyonvAothnneCYOTeLMafWGEjjAKDKrWQ-C63O6rKT5vvuqmbFC3ed7DI0jonyKYKJNYlr0WthSGwmGKXYnBF2Qnjp", "width": 7360
+            "height": 4912, 
+            "html_attributions": ["\u003ca href=\"https://maps.google.com/maps/contrib/108168094198408273739\"\u003eZomatel Hotel\u003c/a\u003e"], 
+            "photo_reference": "AelY_Cvi_2qKjCKvEi4bRgdeDZoWSb5LoSIZRVPfT9B7gBPeB4WOYEQi_5BLQFE2qIREllXifsmeBNNKHnNqnq4eaNgyonvAothnneCYOTeLMafWGEjjAKDKrWQ-C63O6rKT5vvuqmbFC3ed7DI0jonyKYKJNYlr0WthSGwmGKXYnBF2Qnjp", 
+            "width": 7360
          }],
          "place_id": "ChIJmwivj8--5yERyauzU9xA1-4",
          "plus_code": { "compound_code": "G3WP+2P Fianarantsoa, Madagascar", "global_code": "5HC9G3WP+2P" },
@@ -408,9 +411,15 @@ export const nearPlace = {
                "southwest": { "lat": -21.4617907302915, "lng": 47.0845576697085 }
             }
          },
-         "icon":
-            "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/school-71.png",
-         "icon_background_color": "#7B9EB0", "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/school_pinlet", "name": "Centre DevelopMind", "place_id": "ChIJIcEjnSG_5yERB78KqHaS1e8", "reference": "ChIJIcEjnSG_5yERB78KqHaS1e8", "scope": "GOOGLE", "types": ["school", "point_of_interest", "establishment"], "vicinity": "G3QP+R9F, Fianarantsoa"
+         "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/school-71.png",
+         "icon_background_color": "#7B9EB0", 
+         "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/school_pinlet", 
+         "name": "Centre DevelopMind", "place_id": "ChIJIcEjnSG_5yERB78KqHaS1e8", 
+         "reference": "ChIJIcEjnSG_5yERB78KqHaS1e8", 
+         "scope": "GOOGLE", 
+         "types": ["school", "point_of_interest", 
+         "establishment"], 
+         "vicinity": "G3QP+R9F, Fianarantsoa"
       },
       {
          "geometry":
@@ -429,8 +438,8 @@ export const nearPlace = {
          "scope": "GOOGLE",
          "types": ["sublocality_level_1", "sublocality", "political"],
          "vicinity": "Tanana Ambany"
-      }], 
-      "status": "OK"
+      }],
+   "status": "OK"
 }
 
 export const placeDetails = {

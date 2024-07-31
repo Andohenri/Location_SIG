@@ -4,21 +4,36 @@ import { ThemedText } from './ThemedText'
 import { ThemedView } from './ThemedView'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
+import { GOOGLE_API_KEY } from '@/constants/ApiKey'
 
 const CardPlace = ({ place }: any) => {
    return (
-      <ThemedView style={styles.container}>
-         <TouchableOpacity onPress={() => router.push('/modal')} style={{flex: 1}}>
-            <Image source={require('../assets/images/thumbnail.png')} style={{ width: '100%', height: 48, borderRadius: 4 }} />
+      <TouchableOpacity onPress={() => router.push(`/place/${place.place_id}`)} style={styles.container}>
+         <ThemedView style={styles.card}>
+            <ThemedView style={styles.cardHeader}>
+               {place?.photos?.length > 0 ? (
+                  <Image
+                     source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${place.photos[0].width}&photo_reference=${place.photos[0].photo_reference}&key=${GOOGLE_API_KEY}` }}
+                     resizeMode='cover'
+                     style={{ width: '100%', height: 48, borderRadius: 3 }}
+                  />
+               ) : (
+                  <Image
+                     source={require('../assets/images/thumbnail.png')}
+                     resizeMode='cover'
+                     style={{ width: '100%', height: 48, borderRadius: 3 }}
+                  />
+               )}
+            </ThemedView>
             <ThemedView style={styles.cardBody}>
                <ThemedText numberOfLines={1} type='subtitle' style={{ fontSize: 12 }}>{place.name}</ThemedText>
                <ThemedView style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Ionicons size={16} name='star' style={{ color: 'yellow' }} />
+                  <Ionicons size={12} name='star' style={{ color: 'yellow' }} />
                   <ThemedText type='subtitle' style={{ fontSize: 12, color: '#c0c0c0' }}>{place.rating ?? 0} ({place.user_ratings_total ?? 0})</ThemedText>
                </ThemedView>
             </ThemedView>
-         </TouchableOpacity>
-      </ThemedView>
+         </ThemedView>
+      </TouchableOpacity>
    )
 }
 
@@ -26,12 +41,21 @@ export default CardPlace
 
 const styles = StyleSheet.create({
    container: {
-      marginHorizontal: 4,
       width: 100,
-      elevation: 2,
+      marginHorizontal: 4,
+   },
+   card: {
+      borderRadius: 4,
+      elevation: 4
+   },
+   cardHeader: {
+      padding: 2,
+      borderTopLeftRadius: 4,
+      borderTopRightRadius: 4,
    },
    cardBody: {
       padding: 4,
-      flex: 1,
+      borderBottomLeftRadius: 4,
+      borderBottomRightRadius: 4,
    }
 })

@@ -5,12 +5,12 @@ export default function RootLayout() {
   return (
     <LocationProvider>
       <Stack>
-        <Stack.Screen name="index" />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{
+        <Stack.Screen name="place/[id]" options={{
           presentation: 'modal',
-          animation: "slide_from_bottom",
-
+          headerShown: false,
+          animation: "slide_from_bottom"
         }} />
       </Stack>
     </LocationProvider>
