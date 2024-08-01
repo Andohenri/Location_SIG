@@ -3,7 +3,6 @@ import React, { useState, useContext, useRef, useEffect } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { placeDetails } from '@/constants/Data';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StatusBar } from 'expo-status-bar';
@@ -18,7 +17,7 @@ import Review from '@/components/Review';
 const PlaceDetails = () => {
    const { id } = useLocalSearchParams();
    const { data, loading, refetch } = useMap(() => fetchPlaceDetails(id));
-   const [place, setPlace] = useState(placeDetails.result);
+   const [place, setPlace] = useState<any>([]);
    const [distDur, setDistDur] = useState({
       distance: 0,
       duration: 0
@@ -162,7 +161,7 @@ const PlaceDetails = () => {
                   </View>
                   <View style={{ marginTop: 16 }}>
                      <ThemedText type='subtitle' style={{ marginBottom: 16 }}>Quelques commentaires sur la place</ThemedText>
-                     {place?.reviews?.slice(0, 5).map((item, idx) => (
+                     {place?.reviews?.slice(0, 5).map((item: any, idx: any) => (
                         <Review key={idx} review={item} />
                      ))}
                   </View>

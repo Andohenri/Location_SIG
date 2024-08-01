@@ -1,8 +1,7 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
+import { View, TouchableOpacity, Image, StyleSheet } from 'react-native'
 import React from 'react'
 import { ThemedView } from './ThemedView'
 import { ThemedText } from './ThemedText'
-import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { GOOGLE_API_KEY } from '@/constants/ApiKey'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -16,12 +15,12 @@ const ExploreCard = ({ place, type }: any) => {
          <ThemedView style={styles.card}>
             <LinearGradient
                colors={['transparent', '#000000']}
-               style={{ height: type === 'horizontal' ? 200 : 300, zIndex: 10, position: 'absolute', left: 0, right: 0, bottom: 0}}
+               style={{ height: type === 'horizontal' ? 200 : 300, zIndex: 10, position: 'absolute', left: 0, right: 0, bottom: 0 }}
             />
             <ThemedView style={styles.cardHeader}>
                {place?.photos?.length > 0 ? (
                   <Image
-                     source={require('../assets/images/thumbnail.png')}
+                     source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${place.photos[0].width}&photo_reference=${place.photos[0].photo_reference}&key=${GOOGLE_API_KEY}` }}
                      resizeMode='cover'
                      style={{ width: '100%', height: type === 'horizontal' ? 200 : 300, borderRadius: 3 }}
                   />
@@ -35,7 +34,7 @@ const ExploreCard = ({ place, type }: any) => {
             </ThemedView>
             <View style={styles.cardBody}>
                <ThemedText type='title'>{place.name}</ThemedText>
-               <ThemedText type='subtitle' style={{color: '#FFA001'}}>1 miles away</ThemedText>
+               <ThemedText type='subtitle' style={{ color: '#FFA001' }}>1 miles away</ThemedText>
             </View>
          </ThemedView>
       </TouchableOpacity>

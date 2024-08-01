@@ -1,5 +1,5 @@
-import { FlatList, Image, ScrollView, StyleSheet } from 'react-native'
-import React, { useState } from 'react'
+import { FlatList, Image, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { ThemedView } from '@/components/ThemedView'
 import { ThemedText } from '@/components/ThemedText'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -7,39 +7,69 @@ import { StatusBar } from 'expo-status-bar'
 import { useQuery } from '@/contexts/ExploreProvider'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { GOOGLE_API_KEY } from '@/constants/ApiKey'
-import { nearPlace } from '@/constants/Data'
 import ExploreCard from '@/components/ExploreCard'
-import useMap from '@/hooks/useMap'
 import { fetchPlaces } from '@/lib/map'
 
 const Explore = () => {
-   const { query, setQuery } = useQuery();
-   // const { data, loading, refetch } = useMap(() => fetchPlaces(location?.coords.latitude ?? -21.453611, location?.coords.longitude || 47.085833, ['']));
-   // const [places, setPlaces] = useState(data)
+   const { query, setQuery, coordinate, setCoordinate } = useQuery();
+   const [loading, setLoading] = useState(false);
+   const [places, setPlaces] = useState<any>([]);
+   const [sortedPlaces, setSortedPlaces] = useState<any>([]);
+
+   useEffect(() => {
+      if (coordinate) {
+         (async () => {
+            try {
+               setLoading(true);
+               const results = await fetchPlaces(coordinate.lat, coordinate.lng, ['']);
+               setPlaces(results);
+               const sorted = results.sort((a: any, b: any) => b.user_rating_total - a.user_rating_total);
+               setSortedPlaces(sorted);
+            } catch (error) {
+               console.log("Error: " + error);
+            } finally {
+               setLoading(false);
+            }
+         })();
+      }
+   }, [coordinate])
+
    return (
       <SafeAreaView style={{ height: '100%', backgroundColor: '#161622' }}>
-         <ThemedView style={{ flex: 1, padding: 16 }}>
-            <ThemedView style={{ zIndex: 10 }}>
-               <ThemedView style={{ backgroundColor: 'transparent', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexDirection: 'row', marginBottom: 6 }}>
+         <ThemedView style={{ flex: 1, padding: 16, position: 'relative' }}>
+            <ThemedView style={{ zIndex: 1 }}>
+               <ThemedView style={{ justifyContent: 'space-between', alignItems: 'center', gap: 10, flexDirection: 'row', marginBottom: 6 }}>
                   <ThemedText type='title'>Explorer</ThemedText>
                   <Image source={require('../../assets/images/logo.png')} resizeMode='contain' style={{ width: 40, height: 40 }} />
                </ThemedView>
-               <GooglePlacesAutocomplete
-                  placeholder='Search...'
-                  onPress={(data, details = null) => {
-                     const lat = details?.geometry.location.lat;
-                     const lng = details?.geometry.location.lng;
-                     setQuery(data.description);
-                  }}
-                  query={{
-                     key: GOOGLE_API_KEY,
-                     language: 'en'
-                  }}
-                  styles={{ textInputContainer: styles.textContainer, textInput: styles.textInput, predefinedPlacesDescription: { color: '#1faadb' } }}
-               />
             </ThemedView>
-            {query ? (
+            <GooglePlacesAutocomplete
+               placeholder='Rechercher...'
+               onPress={(data, details = null) => {
+                  if (details) {
+                     const { lat, lng } = details.geometry.location;
+                     setCoordinate({ lat, lng });
+                  }
+                  setQuery(data.description);
+               }}
+               fetchDetails={true}
+               query={{
+                  key: GOOGLE_API_KEY,
+                  language: 'en'
+               }}
+               styles={{
+                  container: styles.autocompleteContainer,
+                  textInputContainer: styles.textInputContainer,
+                  textInput: styles.textInput,
+                  listView: styles.listView,
+               }}
+            />
+            {loading ? (
                <ThemedView style={{ marginTop: 70, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <ActivityIndicator />
+               </ThemedView>
+            ) : !coordinate ? (
+               <ThemedView style={{ backgroundColor: '#ccc', marginTop: 70, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                   <Image source={require('../../assets/images/empty.png')} resizeMode='contain' style={{ width: 300, height: 300 }} />
                   <ThemedText type="subtitle" style={{ marginBottom: 16, textAlign: 'center' }}>Veuillez chercher une ville ou une place</ThemedText>
                   <ThemedText type="title" style={{ marginBottom: 16, textAlign: 'center' }}>Aucun résultat</ThemedText>
@@ -47,10 +77,10 @@ const Explore = () => {
             ) : (
                <ThemedView style={{ marginTop: 70, flex: 1 }}>
                   <ScrollView>
-                     <ThemedText style={{ marginTop: 10 }} type='title'>London</ThemedText>
+                     <ThemedText style={{ marginTop: 10 }} type='title'>{query}</ThemedText>
                      <ThemedText style={{ marginTop: 24, color: '#CDCDE0' }} type='subtitle'>A proximité</ThemedText>
                      <FlatList
-                        data={nearPlace.results}
+                        data={places}
                         horizontal
                         keyExtractor={item => item.place_id}
                         renderItem={({ item }) => (
@@ -60,7 +90,7 @@ const Explore = () => {
                      />
                      <ThemedText style={{ marginTop: 24, color: '#CDCDE0' }} type='subtitle'>Populaire</ThemedText>
                      <FlatList
-                        data={nearPlace.results}
+                        data={sortedPlaces}
                         horizontal
                         keyExtractor={item => item.place_id}
                         renderItem={({ item }) => (
@@ -80,9 +110,25 @@ const Explore = () => {
 export default Explore
 
 const styles = StyleSheet.create({
-   textContainer: {
-      marginTop: 16,
-
+   autocompleteContainer: {
+      position: 'absolute',
+      top: 70,
+      left: 16,
+      right: 16,
+      zIndex: 1,
+   },
+   textInputContainer: {
+      backgroundColor: 'rgba(0,0,0,0)',
+      borderTopWidth: 0,
+      borderBottomWidth: 0,
+   },
+   listView: {
+      position: 'absolute',
+      top: 50,
+      left: 0,
+      right: 0,
+      backgroundColor: 'white',
+      zIndex: 2,
    },
    textInput: {
       color: '#161622',

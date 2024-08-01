@@ -7,12 +7,13 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { GOOGLE_API_KEY } from '@/constants/ApiKey'
 import { LocationContext } from '@/contexts/LocationProvider'
-import { nearPlace } from '@/constants/Data'
 import CardPlace from '@/components/CardPlace'
 import { toast } from '@/lib/toast'
 import useMap from '@/hooks/useMap'
 import { fetchPlaces } from '@/lib/map'
 import { StatusBar } from 'expo-status-bar'
+import { useQuery } from '@/contexts/ExploreProvider'
+import { router } from 'expo-router'
 
 const Home = () => {
   const listRef = useRef<FlatList<any>>(null);
@@ -21,6 +22,7 @@ const Home = () => {
     throw new Error("useContext doit etre utiliser dans LocationProvider");
   }
   const { location } = locationContext;
+  const { setQuery, setCoordinate } = useQuery();
   const { data, loading, refetch } = useMap(() => fetchPlaces(location?.coords.latitude ?? -21.453611, location?.coords.longitude || 47.085833, ['']));
   const [places, setPlaces] = useState(data)
 
@@ -71,16 +73,21 @@ const Home = () => {
       </MapView>
       <ThemedView style={{ position: 'absolute', top: 0, width: '100%', backgroundColor: 'transparent', paddingHorizontal: 16, paddingTop: 48 }}>
         <LinearGradient colors={['#fff', 'transparent']} style={{ height: '100%', right: 0, left: 0, position: 'absolute' }} />
-        <ThemedView style={{ backgroundColor: 'transparent', alignItems: 'center', gap: 10, flexDirection: 'row', marginBottom: 6 }}>
+        <ThemedView style={{ backgroundColor: 'transparent', alignItems: 'center', gap: 10, flexDirection: 'row', marginBottom: 16 }}>
           <Image source={require('../../assets/images/logo.png')} resizeMode='contain' style={{ width: 40, height: 40 }} />
           <ThemedText type='title' style={{ color: '#161622' }}>MapMaker</ThemedText>
         </ThemedView>
         <GooglePlacesAutocomplete
           placeholder='Search...'
           onPress={(data, details = null) => {
-            console.log(details);
-            console.log(data);
+            if (details) {
+              const { lat, lng } = details.geometry.location;
+              setCoordinate({ lat, lng });
+              router.push('/explore');
+           }
+           setQuery(data.description);
           }}
+          fetchDetails={true}
           query={{
             key: GOOGLE_API_KEY,
             language: 'en'
